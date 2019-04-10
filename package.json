@@ -7,15 +7,22 @@
   "scripts": {
     "app-with-middlewares": "nodemon --quiet --exec babel-node app-with-middlewares.js",
     "app-with-sagas": "nodemon --quiet --exec babel-node app-with-sagas.js",
-    "demo": "nodemon --quiet --exec babel-node demo.js"
+    "demo": "nodemon --quiet --exec babel-node demo.js",
+    "test": "jest"
   },
   "dependencies": {
-    "@babel/core": "^7.4.0",
+    "@babel/core": "^7.4.3",
     "@babel/node": "^7.2.2",
-    "@babel/preset-env": "^7.4.2",
+    "@babel/plugin-proposal-object-rest-spread": "^7.4.3",
+    "@babel/plugin-transform-async-to-generator": "^7.4.0",
+    "@babel/plugin-transform-runtime": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
+    "babel-jest": "^24.7.1",
     "colors": "^1.3.3",
+    "jest": "^24.7.1",
     "nodemon": "^1.18.10",
     "redux": "^4.0.1",
-    "redux-saga": "^1.0.2"
+    "redux-saga": "^1.0.2",
+    "redux-saga-test-plan": "4.0.0-beta.2"
   }
 }
