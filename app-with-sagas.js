@@ -48,6 +48,8 @@ import {
   put,
   call,
   select,
+  fork,
+  take,
 } from 'redux-saga/effects';
 
 function* listenLogin() {
@@ -99,6 +101,17 @@ function* listenWebsocket() {
   });
 }
 
-sagaMiddleware.run(listenWebsocket);
+// sagaMiddleware.run(listenWebsocket);
+
+function* mainSaga() {
+  console.log('SAGA mainSaga'.green, 'start'.grey);
+  yield fork(listenLogin);
+
+  yield take(ACTION_TYPES.LOGIN_SUCCEEDED);
+  console.log('SAGA mainSaga'.green, 'login success'.grey);
+  yield fork(listenWebsocket);
+}
+
+sagaMiddleware.run(mainSaga);
 
 store.dispatch({ type: ACTION_TYPES.LOGIN });
