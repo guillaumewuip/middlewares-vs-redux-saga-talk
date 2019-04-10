@@ -6,7 +6,7 @@ export const login = () => new Promise((resolve) => {
 
 export const loginThatFail = () => new Promise((_, reject) => {
   setTimeout(() => {
-    reject();
+    reject(new Error('something bad'));
   }, 1000);
 });
 
