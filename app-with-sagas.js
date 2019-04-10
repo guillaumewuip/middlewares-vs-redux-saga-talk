@@ -43,5 +43,49 @@ const store = createStore(
   ),
 );
 
+import {
+  takeEvery,
+  put,
+  call,
+  select,
+} from 'redux-saga/effects';
+
+function* listenLogin() {
+  console.log('SAGA listenLogin'.magenta, 'start'.grey);
+
+  yield takeEvery(ACTION_TYPES.LOGIN, function* (action) {
+    console.log('SAGA listenLogin'.magenta, 'received'.grey, action);
+
+    const isLogged = yield select(isLoggedSelector);
+    console.log('SAGA listenLogin'.magenta, 'state'.grey, isLogged);
+
+    yield put({
+      type: ACTION_TYPES.LOGIN_REQUESTED
+    });
+
+    try {
+      const result = yield call(
+        service.login,
+        // service.loginThatFail,
+      );
+
+      console.log('SAGA listenLogin'.magenta, 'service success'.grey);
+
+      yield put({
+        type: ACTION_TYPES.LOGIN_SUCCEEDED,
+        result,
+      });
+    } catch (error) {
+      console.log('SAGA listenLogin'.magenta, 'service failure'.grey);
+
+      yield put({
+        type: ACTION_TYPES.LOGIN_FAILED,
+        errorMessage: error.message,
+      });
+    }
+  });
+}
+
+sagaMiddleware.run(listenLogin);
 
 store.dispatch({ type: ACTION_TYPES.LOGIN });
