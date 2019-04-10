@@ -86,6 +86,19 @@ function* listenLogin() {
   });
 }
 
-sagaMiddleware.run(listenLogin);
+// sagaMiddleware.run(listenLogin);
+
+function* listenWebsocket() {
+  console.log('SAGA listenWebsocket'.blue, 'start'.grey);
+
+  yield takeEvery(websocketChannel, function* (message) {
+    console.log('SAGA listenWebsocket'.blue, 'message received'.grey);
+    yield put({
+      type: ACTION_TYPES.NOTIFICATION_RECEIVED,
+    });
+  });
+}
+
+sagaMiddleware.run(listenWebsocket);
 
 store.dispatch({ type: ACTION_TYPES.LOGIN });
