@@ -50,41 +50,54 @@ import {
   select,
   fork,
   take,
+  race,
 } from 'redux-saga/effects';
+
+function* login(action) {
+  console.log('SAGA login'.red, 'received'.grey, action);
+
+  const isLogged = yield select(isLoggedSelector);
+  console.log('SAGA login'.red, 'state'.grey, isLogged);
+
+  yield put({
+    type: ACTION_TYPES.LOGIN_REQUESTED
+  });
+
+  try {
+    const result = yield call(
+      service.login,
+      // service.loginThatFail,
+    );
+
+    console.log('SAGA login'.red, 'service success'.grey);
+
+    yield put({
+      type: ACTION_TYPES.LOGIN_SUCCEEDED,
+      result,
+    });
+  } catch (error) {
+    console.log('SAGA login'.red, 'service failure'.grey);
+
+    yield put({
+      type: ACTION_TYPES.LOGIN_FAILED,
+      errorMessage: error.message,
+    });
+  }
+}
 
 function* listenLogin() {
   console.log('SAGA listenLogin'.magenta, 'start'.grey);
 
+
   yield takeEvery(ACTION_TYPES.LOGIN, function* (action) {
-    console.log('SAGA listenLogin'.magenta, 'received'.grey, action);
-
-    const isLogged = yield select(isLoggedSelector);
-    console.log('SAGA listenLogin'.magenta, 'state'.grey, isLogged);
-
-    yield put({
-      type: ACTION_TYPES.LOGIN_REQUESTED
+    const {
+      cancelLogin,
+    } = yield race({
+      login: call(login, action),
+      cancelLogin: take(ACTION_TYPES.CANCEL_LOGIN),
     });
 
-    try {
-      const result = yield call(
-        service.login,
-        // service.loginThatFail,
-      );
-
-      console.log('SAGA listenLogin'.magenta, 'service success'.grey);
-
-      yield put({
-        type: ACTION_TYPES.LOGIN_SUCCEEDED,
-        result,
-      });
-    } catch (error) {
-      console.log('SAGA listenLogin'.magenta, 'service failure'.grey);
-
-      yield put({
-        type: ACTION_TYPES.LOGIN_FAILED,
-        errorMessage: error.message,
-      });
-    }
+    console.log('SAGA listenLogin'.magenta, 'login'.grey, cancelLogin ? 'canceled' : 'done');
   });
 }
 
@@ -115,3 +128,6 @@ function* mainSaga() {
 sagaMiddleware.run(mainSaga);
 
 store.dispatch({ type: ACTION_TYPES.LOGIN });
+// setTimeout(() => {
+//   store.dispatch({ type: ACTION_TYPES.CANCEL_LOGIN });
+// }, 600);
